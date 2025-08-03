@@ -1,0 +1,13 @@
+name: adpy
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy
+  - swig
+  - boost-cpp
+  - libboost
+  - pip
+  - pip:
+      - vina
+      - adpy
