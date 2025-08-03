@@ -1,4 +1,4 @@
-# ADPy: A High-Throughput Tool for Molecular Binding using AutoDock Vina
+# ADPy: A High-Throughput Tool for Molecular Docking using AutoDock Vina
 
 
 ## Installation
