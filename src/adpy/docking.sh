@@ -18,4 +18,7 @@ mk_prepare_receptor.py -i ${root}/examples/proteins/example_protein.pdb -o ${roo
 --box_size 80 80 80 --box_center -.319 5.27 1.59
 
 # Run docking
-python ${root}/src/adpy/docking.py --ligand ${root}/examples/prepared_ligands/example_prepared_ligand.pdbqt --receptor ${root}/examples/prepared_proteins/example_prepared_protein.pdbqt --output_dir ${root}/examples/results
+python ${root}/src/adpy/docking.py --ligand ${root}/examples/prepared_ligands/example_prepared_ligand.pdbqt --receptor ${root}/examples/prepared_proteins/example_prepared_protein.pdbqt --output_dir ${root}/examples/results > ${root}/examples/results/example_docking_output.log 2> ${root}/examples/results/example_docking_error.log 
+
+# Save affinities to file
+python ${root}/src/adpy/utils.py --output_dir ${root}/examples/results 

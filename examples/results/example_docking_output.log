@@ -1,0 +1,19 @@
+Computing Vina grid ... done.
+Performing local search ... done.
+Performing docking (random seed: -2028823868) ... 
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Receptor: /Users/debnathk/Documents/ADPy/examples/prepared_proteins/example_prepared_protein.pdbqt
+Ligand: /Users/debnathk/Documents/ADPy/examples/prepared_ligands/example_prepared_ligand.pdbqt
+Score before minimization: 332.646 (kcal/mol)
+Score after minimization : -3.045 (kcal/mol)
+
+mode |   affinity | dist from best mode
+     | (kcal/mol) | rmsd l.b.| rmsd u.b.
+-----+------------+----------+----------
+   1       -9.274          0          0
+   2       -9.211      5.633      7.784
+   3       -9.191       5.41      7.714
+   4       -9.142      5.569      7.691
+   5       -9.069      1.358       2.95

@@ -1,5 +1,6 @@
 # Run docking
 from vina import Vina
+from utils import *
 import argparse
 
 parser = argparse.ArgumentParser()
