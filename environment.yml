@@ -7,7 +7,13 @@ dependencies:
   - swig
   - boost-cpp
   - libboost
+  - scipy 
+  - meeko 
+  - gemmi 
+  # - autogrid
   - pip
   - pip:
       - vina
-      - adpy
+      - prody
+      - rdkit-pypi
+      # - adpy

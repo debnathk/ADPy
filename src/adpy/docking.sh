@@ -1,15 +1,21 @@
 #!/bin/bash
 
-mkdir -p ./examples/prepared_ligands
-mkdir -p ./examples/prepared_proteins
-mkdir -p ./examples/results
+root='/Users/debnathk/Documents/ADPy'
+
+mkdir -p ${root}/examples/prepared_ligands
+mkdir -p ${root}/examples/prepared_proteins
+mkdir -p ${root}/examples/results
+
+# Activate the conda env
+eval "$(conda shell.bash hook)"
+conda activate adpy
 
 # Prepare ligands
-mk_prepare_ligand.py -i ./examples/ligands/example_ligand.sdf -o ./examples/prepared_ligands/example_prepared_ligand.pdbqt
+mk_prepare_ligand.py -i ${root}/examples/ligands/example_ligand.sdf -o ${root}/examples/prepared_ligands/example_prepared_ligand.pdbqt
 
 # Prepare targets
-mk_prepare_receptor.py -i ./examples/proteins/example_protein.pdb -o ./examples/prepared_proteins/example_prepared_protein.pdbqt -p -v \
+mk_prepare_receptor.py -i ${root}/examples/proteins/example_protein.pdb -o ${root}/examples/prepared_proteins/example_prepared_protein -p -v \
 --box_size 80 80 80 --box_center -.319 5.27 1.59
 
 # Run docking
-python docking.py --ligand ./examples/prepared_ligands/example_prepared_ligand.pdbqt --receptor ./examples/prepared_proteins/example_prepared_protein.pdbqt
+python ${root}/src/adpy/docking.py --ligand ${root}/examples/prepared_ligands/example_prepared_ligand.pdbqt --receptor ${root}/examples/prepared_proteins/example_prepared_protein.pdbqt --output_dir ${root}/examples/results
