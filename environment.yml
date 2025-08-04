@@ -16,4 +16,5 @@ dependencies:
       - vina
       - prody
       - rdkit-pypi
+      - pandas
       # - adpy
