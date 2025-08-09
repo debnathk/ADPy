@@ -22,8 +22,8 @@ conda activate adpy
 
 ```
 python main.py \
-    --ligand ./example/prepared_ligands/example_prepared_ligand.pdbqt \
-    --receptor ./example/prepared_receptors/example_prepared_receptor.pdbqt \
+    --ligand ./examples/prepared_ligands/example_prepared_ligand.pdbqt \
+    --receptor ./examples/prepared_receptors/example_prepared_receptor.pdbqt \
     --output-dir ./outputs
 ```
 
