@@ -1,11 +1,14 @@
 # Run docking
 from vina import Vina
+from .utils import trimName
 import argparse
+import os
+import csv
 
 def dock_prep(ligand=None, receptor=None, output_dir='/Users/debnathk/Documents/ADPy/examples/results'):
     pass
 
-def run_dock(ligand=None, receptor=None, output_dir='/Users/debnathk/Documents/ADPy/examples/results'):
+def run_dock(ligand, receptor, output_dir):
     '''
     Run docking using Autodock Vina
 
@@ -44,11 +47,55 @@ def run_dock(ligand=None, receptor=None, output_dir='/Users/debnathk/Documents/A
 
     print(f"Docking Succesfull: Output saved in {output_dir}")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--ligand', required=True, help='Set the ligand path')
-    parser.add_argument('--receptor', required=True, help='Set the receptor path')
-    parser.add_argument('--output_dir', required=True, help='Set path to save docking output')
-    args = parser.parse_args()
+    # Save output CSV file
+    output_csv = "example_docking_results.csv"
+    output_path = os.path.join(output_dir, output_csv)
 
-    run_dock(ligand=args.ligand, receptor=args.receptor)
+    # Collect results
+    results = []
+
+    # for filename in os.listdir(results_folder):
+    # if filename.endswith("output.log"):
+    #     filepath = os.path.join(results_folder, filename)
+    #     print(filepath)
+    # ligand = receptor = affinity = None
+
+    pdbqt_files = [f for f in os.listdir(output_dir) if f.endswith(".pdbqt")]
+    pdbqt_file = os.path.join(output_dir, pdbqt_files[0])
+    # print(f'Reading {pdbqt_file}')
+
+    with open(pdbqt_file, "r", encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            if line.startswith("REMARK VINA RESULT:"):
+                affinity = line.split()[3]
+                # print(affinity)
+                break
+
+        # Preprocess the long names of ligand, and proteins - only keep the entity name
+        ligand = trimName(ligand);
+        receptor = trimName(receptor);
+
+
+        print(ligand, receptor, affinity)
+
+        # if ligand and receptor and affinity:
+        results.append([ligand, receptor, affinity])
+
+        # df = pd.DataFrame({'Ligand': ligand, 'Receptor': receptor, 'Binding_Affinity(kcal/mol)': affinity}, index=[0])
+
+    # Write to CSV
+    with open(output_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["ligand", "receptor", "binding_affinity(kcal/mol)"])
+        writer.writerows(results)
+
+    print(f"Results saved to {output_path}")
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--ligand', required=True, help='Set the ligand path')
+#     parser.add_argument('--receptor', required=True, help='Set the receptor path')
+#     parser.add_argument('--output_dir', required=True, help='Set path to save docking output')
+#     args = parser.parse_args()
+
+#     run_dock(ligand=args.ligand, receptor=args.receptor, output_dir=args.output_dir)
