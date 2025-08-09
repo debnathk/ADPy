@@ -2,9 +2,11 @@
 
 # Clone Repo
 
+```
 git clone https://github.com/debnathk/ADPy.git
-
 cd ADPy
+```
+
 
 # Installation
 
