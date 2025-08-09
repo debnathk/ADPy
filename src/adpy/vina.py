@@ -2,7 +2,19 @@
 from vina import Vina
 import argparse
 
+def dock_prep(ligand=None, receptor=None, output_dir='/Users/debnathk/Documents/ADPy/examples/results'):
+    pass
+
 def run_dock(ligand=None, receptor=None, output_dir='/Users/debnathk/Documents/ADPy/examples/results'):
+    '''
+    Run docking using Autodock Vina
+
+    Args:
+        ligand = Prepared ligand (.pdbqt)
+        receptor = Prepared receptor (.pdbqt)
+        output_dir = Path to save the docking output
+
+    '''
 
     v = Vina(sf_name='vina')
 
