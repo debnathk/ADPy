@@ -18,21 +18,8 @@ conda activate adpy
 
 ### Run Docking
 
-```
-from adpy import run_dock
-
-prep_ligand = '../examples/prepared_ligands/example_prepared_ligand.pdbqt'
-prep_receptor = '../examples/prepared_proteins/example_prepared_protein.pdbqt'
-
-run_dock(ligand=prep_ligand, receptor=prep_receptor)
-```
-
-### Save Output (as .csv)
+#### Type I: One Ligand - One Receptor Docking
 
 ```
-from adpy import pdbqt2csv
-
-pdqt_file = "../examples/results/example_docking.pdbqt"
-
-result = pdbqt2csv(pdbqt_file=pdqt_file)
+python main.py --ligand path/to/ligand --receptor path/to/receptor --output-dir path/to/output
 ```
