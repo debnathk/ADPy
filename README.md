@@ -1,4 +1,4 @@
-# ADPy: A High-Throughput Tool for Molecular Docking using AutoDock Vina
+# ADPy: A Python Package for High-Throughput Molecular Docking using AutoDock Vina
 
 ## Clone Repo
 
