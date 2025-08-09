@@ -21,12 +21,15 @@ conda activate adpy
 #### Type I: One Ligand - One Receptor Docking
 
 ```
-python main.py --ligand ./example/prepared_ligands/example_prepared_ligand.pdbqt \
-		--receptor ./example/prepared_ligands/example_prepared_ligand.pdbqt \
-		--output-dir ./outputs
+python main.py \
+    --ligand ./example/prepared_ligands/example_prepared_ligand.pdbqt \
+    --receptor ./example/prepared_receptors/example_prepared_receptor.pdbqt \
+    --output-dir ./outputs
 ```
 
 ### Ligands and Proteins from User
+
+**Note: Both the ligand and receptor files are needed to be prepared and must be in .pdbqt format.**
 
 #### Type I: One Ligand - One Receptor Docking
 
