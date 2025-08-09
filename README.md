@@ -1,12 +1,12 @@
 # ADPy: A High-Throughput Tool for Molecular Docking using AutoDock Vina
 
+# Clone Repo
+
+git clone https://github.com/debnathk/ADPy.git
+
+cd ADPy
+
 # Installation
-
-## Using pip
-
-```
-pip install adpy
-```
 
 ## Using conda
 
