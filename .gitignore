@@ -1,0 +1,8 @@
+*.pdf
+*.toml
+__pycache__
+*.ipynb
+outputs
+adpy/alphafold.py
+adpy/docking.sh
+adpy/uniprot.py

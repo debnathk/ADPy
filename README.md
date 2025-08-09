@@ -7,7 +7,7 @@ git clone https://github.com/debnathk/ADPy.git
 cd ADPy
 ```
 
-## Conda Installation
+## Setup Virtual Environment (Conda)
 
 ```
 conda env create -f environment.yml
