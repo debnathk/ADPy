@@ -27,7 +27,7 @@ python main.py \
     --output-dir ./outputs
 ```
 
-### Type II: Multi Ligand - One Receptor Docking
+#### Type II: Multi Ligand - One Receptor Docking
 
 ```
 python main.py \
