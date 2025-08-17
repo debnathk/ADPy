@@ -1,6 +1,7 @@
 import os
 import csv
 from typing import List, Tuple, Optional, Union
+import subprocess
 
 from vina import Vina
 from .utils import trimName, extractBindingAffinity
@@ -15,10 +16,10 @@ class AutoDock:
             sf_name: Scoring function name for Vina
         """
         self.v = Vina(sf_name=sf_name)
-        self.default_center = [-.319, 5.27, 1.59]
-        self.default_box_size = [80, 80, 80]
+        self.default_center = (-.319, 5.27, 1.59)
+        self.default_box_size = (80, 80, 80)
 
-    def singleLigandSingleReceptor(self, ligand: str, receptor: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> dict:
+    def singleLigandSingleReceptor(self, ligand: str, receptor: str, output_dir: str, AlphaFold: bool = True, center: Optional[Tuple[float, float, float]] = None, box_size: Optional[Tuple[int, int, int]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> dict:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -39,7 +40,7 @@ class AutoDock:
         # Validate input files
         self._validate_input_files(ligand, receptor)
 
-        # use default values if not provided
+        # use default values if AlphaFold protein
         center = self.default_center if AlphaFold else center
         box_size = self.default_box_size if AlphaFold else box_size
 
@@ -67,7 +68,7 @@ class AutoDock:
             print(f"Docking failed: {str(e)}")
             raise 
 
-    def multiLigandSingleReceptor(self, ligand_dir: str, receptor: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+    def multiLigandSingleReceptor(self, ligand_dir: str, receptor: str, output_dir: str, AlphaFold: bool = True, center: Optional[Tuple[float, float, float]] = None, box_size: Optional[Tuple[int, int, int]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -118,17 +119,12 @@ class AutoDock:
             if not os.path.exists(output_path):
                 print(f"Failed to create {output_path}")
             print(f"Docking successful: Output saved in {output_dir}")
-            # # Save results if requested
-            # if save_csv:
-            #     self._save_results_to_csv(df_final, output_dir)
-
-            # return docking_results
 
         except Exception as e:
             print(f"Docking failed: {str(e)}")
             raise
 
-    def singleLigandMultiReceptor(self, ligand: str, receptor_dir: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+    def singleLigandMultiReceptor(self, ligand: str, receptor_dir: str, output_dir: str, AlphaFold: bool = True, center: Optional[Tuple[float, float, float]] = None, box_size: Optional[Tuple[int, int, int]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -179,17 +175,12 @@ class AutoDock:
             if not os.path.exists(output_path):
                 print(f"Failed to create {output_path}")
             print(f"Docking successful: Output saved in {output_dir}")
-            # # Save results if requested
-            # if save_csv:
-            #     self._save_results_to_csv(df_final, output_dir)
-
-            # return docking_results
 
         except Exception as e:
             print(f"Docking failed: {str(e)}")
             raise
 
-    def multiLigandMultiReceptor(self, ligand_dir: str, receptor_dir: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+    def multiLigandMultiReceptor(self, ligand_dir: str, receptor_dir: str, output_dir: str, AlphaFold: bool = True, center: Optional[Tuple[float, float, float]] = None, box_size: Optional[Tuple[int, int, int]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -246,11 +237,6 @@ class AutoDock:
             if not os.path.exists(output_path):
                 print(f"Failed to create {output_path}")
             print(f"Docking successful: Output saved in {output_dir}")
-            # # Save results if requested
-            # if save_csv:
-            #     self._save_results_to_csv(df_final, output_dir)
-
-            # return docking_results
 
         except Exception as e:
             print(f"Docking failed: {str(e)}")
@@ -310,57 +296,7 @@ class AutoDock:
             'ligand': ligand_name,
             'receptor': receptor_name,
             'binding_affinity': binding_affinity
-            # 'output_file': output_file
         }
-
-    def _save_results_to_csv(self, results: dict, output_dir: str) -> None:
-        """Save docking results to CSV file"""
-        # Save output CSV file
-        output_csv = f"{results['ligand']}_{results['receptor']}_docking_results.csv"
-        output_path = os.path.join(output_dir, output_csv)
-
-        # Collect results
-        # df_results = pl.DataFrame(results)
-
-        # # for filename in os.listdir(results_folder):
-        # # if filename.endswith("output.log"):
-        # #     filepath = os.path.join(results_folder, filename)
-        # #     print(filepath)
-        # # ligand = receptor = affinity = None
-
-        # pdbqt_files = [f for f in os.listdir(output_dir) if f.endswith(".pdbqt")]
-        # pdbqt_file = os.path.join(output_dir, pdbqt_files[0])
-        # # print(f'Reading {pdbqt_file}')
-
-        # with open(pdbqt_file, "r", encoding="utf-8", errors="ignore") as f:
-        #     for line in f:
-        #         if line.startswith("REMARK VINA RESULT:"):
-        #             affinity = line.split()[3]
-        #             # print(affinity)
-        #             break
-
-        #     # Preprocess the long names of ligand, and proteins - only keep the entity name
-        #     ligand = trimName(ligand)
-        #     receptor = trimName(receptor)
-
-
-        #     print(ligand, receptor, affinity)
-
-        #     # if ligand and receptor and affinity:
-        #     results.append([ligand, receptor, affinity])
-
-        #     # df = pd.DataFrame({'Ligand': ligand, 'Receptor': receptor, 'Binding_Affinity(kcal/mol)': affinity}, index=[0])
-
-        # Write to CSV
-        with open(output_path, "w") as csvfile:
-            df_results = pl.DataFrame(results)
-            df_results.write_csv(csvfile)
-            # writer = csv.writer(csvfile)
-            # writer.writerow(["ligand", "receptor", "binding_affinity(kcal/mol)"])
-            # writer.writerow([results['ligand'], results['receptor'], results['binding_affinity']])
-
-        print(f"Results saved to {output_path}")
-
 
 if __name__ == "__main__":
     docker = AutoDock()
@@ -371,3 +307,74 @@ if __name__ == "__main__":
     )
 
     print(f"Binding affinity: {results['binding_affinity']} kcal/mol")
+
+class DockPrep:
+    def __init__(self, ligand_tool="mk_prepare_ligand.py", receptor_tool="mk_prepare_receptor.py"):
+        self.ligand_tool = ligand_tool
+        self.receptor_tool = receptor_tool
+        self.default_box_center = (-.319, 5.27, 1.59)
+        self.default_box_size = (80, 80, 80)
+
+    def prepare_ligand(self, query: str, target: str) -> None:
+        """Prepare a single ligand"""
+        try:
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+            subprocess.run(
+                [self.ligand_tool, "-i", query, "-o", target],
+                check=True
+            )
+            print(f"Ligand prepared: {target}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error preparing ligand {query}: {e}")
+
+    def prepare_receptor(
+        self,
+        query: str,
+        target_prefix: str,
+        AlphaFold: bool = True,
+        box_size: Optional[Tuple[int, int, int]] = None,
+        box_center: Optional[Tuple[float, float, float]] = None
+    ) -> None:
+        """Prepare a single receptor with box size and center"""
+
+        # use default values if AlphaFold protein
+        if AlphaFold:
+            box_center = self.default_box_center
+            box_size = self.default_box_size
+        else:
+            if box_center is None or box_size is None:
+                raise ValueError("box_size and box_center must be provided if AlphaFold=False")
+
+        try:
+            os.makedirs(os.path.dirname(target_prefix), exist_ok=True)
+            subprocess.run(
+                [
+                    self.receptor_tool, "-i", query, "-o", target_prefix,
+                    "-p", "-v",
+                    "--box_size", *map(str, box_size),
+                    "--box_center", *map(str, box_center),
+                ],
+                check=True
+            )
+            print(f"Receptor prepared: {target_prefix}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error preparing receptor {query}: {e}")
+
+    def prepare_ligands_batch(self, ligands: List[Tuple[str, str]]) -> None:
+        """Batch process ligands: [(input_file, output_file), ...]"""
+        for query, target in ligands:
+            self.prepare_ligand(query, target)
+
+    def prepare_receptors_batch(
+        self,
+        receptors: List[Tuple[str, str, bool, Optional[Tuple[int, int, int]], Optional[Tuple[float, float, float]]]]
+    ) -> None:
+        """
+        Batch process receptors: 
+        [(input_file, output_prefix, box_size, box_center, AlphaFold), ...]
+        """
+        for query, target_prefix, AlphaFold, box_size, box_center in receptors:
+            if AlphaFold:
+                self.prepare_receptor(query, target_prefix, AlphaFold, None, None)
+            else:
+                self.prepare_receptor(query, target_prefix, AlphaFold, box_size, box_center)
