@@ -108,11 +108,5 @@ def trimName(filepath):
 #     # print(f"Results saved to {output_path}")
 #     return df
 
-def getAlphaFold(gene: Optional[str] = None, uniprot: Optional[str] = None):
-    if gene:
-        pass
-    if uniprot:
-        pass
-
 if __name__ == "__main__":
     pass
