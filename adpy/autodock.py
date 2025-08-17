@@ -18,7 +18,7 @@ class AutoDock:
         self.default_center = [-.319, 5.27, 1.59]
         self.default_box_size = [80, 80, 80]
 
-    def singleLigandSingleReceptor(self, ligand: str, receptor: str, output_dir: str, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> dict:
+    def singleLigandSingleReceptor(self, ligand: str, receptor: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> dict:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -40,8 +40,8 @@ class AutoDock:
         self._validate_input_files(ligand, receptor)
 
         # use default values if not provided
-        center = center or self.default_center
-        box_size = box_size or self.default_box_size
+        center = self.default_center if AlphaFold else center
+        box_size = self.default_box_size if AlphaFold else box_size
 
         # Ensure output directories exist
         os.makedirs(output_dir, exist_ok=True)
@@ -67,7 +67,7 @@ class AutoDock:
             print(f"Docking failed: {str(e)}")
             raise 
 
-    def multiLigandSingleReceptor(self, ligand_dir: str, receptor: str, output_dir: str, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+    def multiLigandSingleReceptor(self, ligand_dir: str, receptor: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -89,8 +89,8 @@ class AutoDock:
         self._validate_input_dir(ligand_dir)
 
         # use default values if not provided
-        center = center or self.default_center
-        box_size = box_size or self.default_box_size
+        center = self.default_center if AlphaFold else center
+        box_size = self.default_box_size if AlphaFold else box_size
 
         # Ensure output directories exist
         os.makedirs(output_dir, exist_ok=True)
@@ -128,7 +128,7 @@ class AutoDock:
             print(f"Docking failed: {str(e)}")
             raise
 
-    def singleLigandMultiReceptor(self, ligand: str, receptor_dir: str, output_dir: str, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+    def singleLigandMultiReceptor(self, ligand: str, receptor_dir: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -150,8 +150,8 @@ class AutoDock:
         self._validate_input_dir(receptor_dir)
 
         # use default values if not provided
-        center = center or self.default_center
-        box_size = box_size or self.default_box_size
+        center = self.default_center if AlphaFold else center
+        box_size = self.default_box_size if AlphaFold else box_size
 
         # Ensure output directories exist
         os.makedirs(output_dir, exist_ok=True)
@@ -189,7 +189,7 @@ class AutoDock:
             print(f"Docking failed: {str(e)}")
             raise
 
-    def multiLigandMultiReceptor(self, ligand_dir: str, receptor_dir: str, output_dir: str, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+    def multiLigandMultiReceptor(self, ligand_dir: str, receptor_dir: str, output_dir: str, AlphaFold: bool = True, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -212,8 +212,8 @@ class AutoDock:
         self._validate_input_dir(receptor_dir)
 
         # use default values if not provided
-        center = center or self.default_center
-        box_size = box_size or self.default_box_size
+        center = self.default_center if AlphaFold else center
+        box_size = self.default_box_size if AlphaFold else box_size
 
         # Ensure output directories exist
         os.makedirs(output_dir, exist_ok=True)
