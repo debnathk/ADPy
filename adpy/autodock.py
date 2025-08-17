@@ -4,6 +4,7 @@ from typing import List, Tuple, Optional, Union
 
 from vina import Vina
 from .utils import trimName, extractBindingAffinity
+import polars as pl
 
 class AutoDock:
     def __init__(self, sf_name: str = 'vina') -> None:
@@ -53,7 +54,11 @@ class AutoDock:
 
             # Save results if requested
             if save_csv:
-                self._save_results_to_csv(docking_results, output_dir)
+                # self._save_results_to_csv(docking_results, output_dir)
+                df_docking_results = pl.DataFrame(docking_results)
+                csv_path = f"{docking_results['ligand']}_{docking_results['receptor']}_docking_results.csv"
+                output_path = os.path.join(output_dir, csv_path)
+                df_docking_results.write_csv(output_path)
 
             print(f"Docking successful: Output saved in {output_dir}")
             return docking_results
@@ -62,6 +67,194 @@ class AutoDock:
             print(f"Docking failed: {str(e)}")
             raise 
 
+    def multiLigandSingleReceptor(self, ligand_dir: str, receptor: str, output_dir: str, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+        """
+        Run docking: Single Ligand - Single Receptor
+
+        Args:
+            ligand: Path to prepared ligand (.pdbqt)
+            receptor: Path to prepared receptor (.pdbqt)
+            output_dir: Directory to save docking output
+            centre: pass
+            box_size: pass
+            exhaustiveness: pass
+            n_poses: pass
+            save_csv: pass
+
+        Raises:
+            FileNotFoundError: If ligand or receptor file doesn't exist
+            Exception: If docking process fails
+        """
+        # Validate input files
+        self._validate_input_dir(ligand_dir)
+
+        # use default values if not provided
+        center = center or self.default_center
+        box_size = box_size or self.default_box_size
+
+        # Ensure output directories exist
+        os.makedirs(output_dir, exist_ok=True)
+
+        # List all the ligands from the directory
+        ligands = [f for f in os.listdir(ligand_dir) if f.endswith('.pdbqt')]
+        df_docking_results_all = []
+
+        try:
+            for ligand in ligands:
+                ligand = os.path.join(ligand_dir, ligand)
+                # Setup docking
+                docking_results = self._setup_and_dock(
+                    ligand, receptor, center, box_size, exhaustiveness, n_poses, output_dir
+                )
+                df_docking_results = pl.DataFrame(docking_results)
+                df_docking_results_all.append(df_docking_results)
+
+            df_final = pl.concat(df_docking_results_all)
+            output_csv = f"{df_final['receptor'][0]}_docking_results.csv"
+            output_path = os.path.join(output_dir, output_csv)
+            df_final.write_csv(output_path)
+
+            # Check if results not saved as CSV
+            if not os.path.exists(output_path):
+                print(f"Failed to create {output_path}")
+            print(f"Docking successful: Output saved in {output_dir}")
+            # # Save results if requested
+            # if save_csv:
+            #     self._save_results_to_csv(df_final, output_dir)
+
+            # return docking_results
+
+        except Exception as e:
+            print(f"Docking failed: {str(e)}")
+            raise
+
+    def singleLigandMultiReceptor(self, ligand: str, receptor_dir: str, output_dir: str, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+        """
+        Run docking: Single Ligand - Single Receptor
+
+        Args:
+            ligand: Path to prepared ligand (.pdbqt)
+            receptor: Path to prepared receptor (.pdbqt)
+            output_dir: Directory to save docking output
+            centre: pass
+            box_size: pass
+            exhaustiveness: pass
+            n_poses: pass
+            save_csv: pass
+
+        Raises:
+            FileNotFoundError: If ligand or receptor file doesn't exist
+            Exception: If docking process fails
+        """
+        # Validate input files
+        self._validate_input_dir(receptor_dir)
+
+        # use default values if not provided
+        center = center or self.default_center
+        box_size = box_size or self.default_box_size
+
+        # Ensure output directories exist
+        os.makedirs(output_dir, exist_ok=True)
+
+        # List all the receptors from the directory
+        receptors = [f for f in os.listdir(receptor_dir) if f.endswith('.pdbqt')]
+        df_docking_results_all = []
+
+        try:
+            for receptor in receptors:
+                receptor = os.path.join(receptor_dir, receptor)
+                # Setup docking
+                docking_results = self._setup_and_dock(
+                    ligand, receptor, center, box_size, exhaustiveness, n_poses, output_dir
+                )
+                df_docking_results = pl.DataFrame(docking_results)
+                df_docking_results_all.append(df_docking_results)
+
+            df_final = pl.concat(df_docking_results_all)
+            output_csv = f"{df_final['ligand'][0]}_docking_results.csv"
+            output_path = os.path.join(output_dir, output_csv)
+            df_final.write_csv(output_path)
+
+            # Check if results not saved as CSV
+            if not os.path.exists(output_path):
+                print(f"Failed to create {output_path}")
+            print(f"Docking successful: Output saved in {output_dir}")
+            # # Save results if requested
+            # if save_csv:
+            #     self._save_results_to_csv(df_final, output_dir)
+
+            # return docking_results
+
+        except Exception as e:
+            print(f"Docking failed: {str(e)}")
+            raise
+
+    def multiLigandMultiReceptor(self, ligand_dir: str, receptor_dir: str, output_dir: str, center: Optional[List[float]] = None, box_size: Optional[List[float]] = None, exhaustiveness: int = 32, n_poses: int = 5, save_csv: bool = True) -> None:
+        """
+        Run docking: Single Ligand - Single Receptor
+
+        Args:
+            ligand: Path to prepared ligand (.pdbqt)
+            receptor: Path to prepared receptor (.pdbqt)
+            output_dir: Directory to save docking output
+            centre: pass
+            box_size: pass
+            exhaustiveness: pass
+            n_poses: pass
+            save_csv: pass
+
+        Raises:
+            FileNotFoundError: If ligand or receptor file doesn't exist
+            Exception: If docking process fails
+        """
+        # Validate ligand and receptor dirs
+        self._validate_input_dir(ligand_dir)
+        self._validate_input_dir(receptor_dir)
+
+        # use default values if not provided
+        center = center or self.default_center
+        box_size = box_size or self.default_box_size
+
+        # Ensure output directories exist
+        os.makedirs(output_dir, exist_ok=True)
+
+        # List all ligands and receptors from the directory
+        receptors = [f for f in os.listdir(receptor_dir) if f.endswith('.pdbqt')]
+        ligands = [f for f in os.listdir(ligand_dir) if f.endswith('.pdbqt')]
+
+        df_docking_results_all = []
+
+        try:
+            for receptor in receptors:
+                receptor = os.path.join(receptor_dir, receptor)
+                for ligand in ligands:
+                    ligand = os.path.join(ligand_dir, ligand)
+
+                    # Setup docking
+                    docking_results = self._setup_and_dock(
+                        ligand, receptor, center, box_size, exhaustiveness, n_poses, output_dir
+                    )
+                    df_docking_results = pl.DataFrame(docking_results)
+                    df_docking_results_all.append(df_docking_results)
+
+            df_final = pl.concat(df_docking_results_all)
+            output_csv = "docking_results.csv"
+            output_path = os.path.join(output_dir, output_csv)
+            df_final.write_csv(output_path)
+
+            # Check if results not saved as CSV
+            if not os.path.exists(output_path):
+                print(f"Failed to create {output_path}")
+            print(f"Docking successful: Output saved in {output_dir}")
+            # # Save results if requested
+            # if save_csv:
+            #     self._save_results_to_csv(df_final, output_dir)
+
+            # return docking_results
+
+        except Exception as e:
+            print(f"Docking failed: {str(e)}")
+            raise
 
     def _validate_input_files(self, ligand: str, receptor: str) -> None:
         """Validate that input files exist and have correct extensions."""
@@ -70,6 +263,11 @@ class AutoDock:
                 raise FileNotFoundError(f"{file_type.capitalize()} file not found: {file_path}")
             if not file_path.endswith('pdbqt'):
                 raise ValueError(f"{file_type.capitalize()} file must be in .pdbqt format: {file_path}")
+            
+    def _validate_input_dir(self, dir: str) -> None:
+        """Validate that input dir exists"""
+        if not os.path.exists(dir):
+            raise FileNotFoundError(f"{dir} not found.")
             
     def _setup_and_dock(self, ligand: str, receptor: str, center: List[float], box_size: List[float], exhaustiveness: int, n_poses: int, output_dir: str) -> dict:
         """Setup Vina parameters and perform docking."""
@@ -111,8 +309,8 @@ class AutoDock:
         return {
             'ligand': ligand_name,
             'receptor': receptor_name,
-            'binding_affinity': binding_affinity,
-            'output_file': output_file
+            'binding_affinity': binding_affinity
+            # 'output_file': output_file
         }
 
     def _save_results_to_csv(self, results: dict, output_dir: str) -> None:
@@ -121,8 +319,8 @@ class AutoDock:
         output_csv = f"{results['ligand']}_{results['receptor']}_docking_results.csv"
         output_path = os.path.join(output_dir, output_csv)
 
-        # # Collect results
-        # results = []
+        # Collect results
+        # df_results = pl.DataFrame(results)
 
         # # for filename in os.listdir(results_folder):
         # # if filename.endswith("output.log"):
@@ -154,22 +352,14 @@ class AutoDock:
         #     # df = pd.DataFrame({'Ligand': ligand, 'Receptor': receptor, 'Binding_Affinity(kcal/mol)': affinity}, index=[0])
 
         # Write to CSV
-        with open(output_path, "w", newline="") as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(["ligand", "receptor", "binding_affinity(kcal/mol)"])
-            writer.writerow([results['ligand'], results['receptor'], results['binding_affinity']])
+        with open(output_path, "w") as csvfile:
+            df_results = pl.DataFrame(results)
+            df_results.write_csv(csvfile)
+            # writer = csv.writer(csvfile)
+            # writer.writerow(["ligand", "receptor", "binding_affinity(kcal/mol)"])
+            # writer.writerow([results['ligand'], results['receptor'], results['binding_affinity']])
 
         print(f"Results saved to {output_path}")
-        
-
-    # def multiLigandSingleRecepror(self, ligand_dir: str, receptor: str, output_dir: str) -> None:
-    #     pass
-
-    # def singleLigandMultiRecepror(self, ligand: str, receptor_dir: str, output_dir: str) -> None:
-    #     pass
-
-    # def multiLigandMultiRecepror(self, ligand_dir: str, receptor_dir: str, output_dir: str) -> None:
-    #     pass
 
 
 if __name__ == "__main__":
