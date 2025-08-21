@@ -308,7 +308,17 @@ class AutoDock:
             raise
 
     def _validate_input_files(self, ligand: str, receptor: str) -> None:
-        """Validate that input files exist and have correct extensions."""
+        """Validate that input files exist and have correct extensions.
+        Run docking: Single Ligand - Single Receptor
+
+        Args:
+        ligand (str): Path to a single ligand file in .pdbqt format.
+        receptor (str): Path to a single receptor file in .pdbqt format.
+
+        Raises:
+            FileNotFoundError: If ligand or receptor file doesn't exist
+            Exception: If docking process fails
+        """
         for file_path, file_type in [(ligand, "ligand"), (receptor, "receptor")]:
             if not os.path.exists(file_path):
                 raise FileNotFoundError(
@@ -320,7 +330,16 @@ class AutoDock:
                 )
 
     def _validate_input_dir(self, dir: str) -> None:
-        """Validate that input dir exists"""
+        """Validate that input dir exists
+        Run docking: Single Ligand - Single Receptor
+        
+        Args:
+        input_dir (str): Path to the input directory.
+
+        Raises:
+            FileNotFoundError: If ligand or receptor file doesn't exist
+            Exception: If docking process fails
+        """
         if not os.path.exists(dir):
             raise FileNotFoundError(f"{dir} not found.")
 
@@ -334,7 +353,28 @@ class AutoDock:
         n_poses: int,
         output_dir: str,
     ) -> dict:
-        """Setup Vina parameters and perform docking."""
+        """
+    Sets up and performs molecular docking using AutoDock Vina.
+
+    This method configures the docking parameters, scores and minimizes the 
+    initial pose, performs docking, saves the resulting poses, and extracts 
+    the binding affinity of the best pose.
+
+    Args:
+        ligand (str): Path to the ligand file in PDBQT format.
+        receptor (str): Path to the receptor file in PDBQT format.
+        center (List[float]): Coordinates [x, y, z] for the center of the docking box.
+        box_size (List[float]): Dimensions [x, y, z] of the docking box.
+        exhaustiveness (int): Exhaustiveness of the global search. Higher values increase accuracy and time.
+        n_poses (int): Number of binding poses to generate.
+        output_dir (str): Directory where docking results will be saved.
+
+    Returns:
+        dict: A dictionary containing:
+            - 'ligand' (str): Base name of the ligand file.
+            - 'receptor' (str): Base name of the receptor file.
+            - 'binding_affinity' (float or list): Binding affinity score(s) from docking results (in kcal/mol).
+    """
 
         # Set receptor
         self.v.set_receptor(receptor)
@@ -398,7 +438,19 @@ class DockPrep:
         self.default_box_size = (80, 80, 80)
 
     def prepare_ligand(self, query: str, target: str) -> None:
-        """Prepare a single ligand"""
+        """
+    Prepares a single ligand file for docking by converting or formatting it using an external tool.
+
+    This method uses an external command-line tool (specified by `self.ligand_tool`) to process 
+    the input ligand file and generate a prepared ligand file suitable for docking (e.g., in PDBQT format).
+
+    Args:
+        query (str): Path to the input ligand file (e.g., MOL2, SDF).
+        target (str): Path where the prepared ligand file will be saved.
+
+    Raises:
+        Prints an error message if the external tool fails during execution.
+    """
         try:
             os.makedirs(os.path.dirname(target), exist_ok=True)
             subprocess.run([self.ligand_tool, "-i", query, "-o", target], check=True)
@@ -414,7 +466,28 @@ class DockPrep:
         box_size: Optional[Tuple[int, int, int]] = None,
         box_center: Optional[Tuple[float, float, float]] = None,
     ) -> None:
-        """Prepare a single receptor with box size and center"""
+        """
+    Prepares a single receptor file for docking by processing the input structure 
+    and defining the docking box using an external tool.
+
+    If the receptor is from AlphaFold, default box size and center (defined in 
+    `self.default_box_size` and `self.default_box_center`) are used. Otherwise, 
+    both `box_size` and `box_center` must be provided.
+
+    Args:
+        query (str): Path to the input receptor file (e.g., in PDB format).
+        target_prefix (str): Output path prefix for the prepared receptor files.
+        AlphaFold (bool, optional): Whether the receptor is from AlphaFold. If True, 
+            uses default box parameters. Defaults to True.
+        box_size (Optional[Tuple[int, int, int]]): Size of the docking box (x, y, z).
+            Required if AlphaFold is False.
+        box_center (Optional[Tuple[float, float, float]]): Center of the docking box (x, y, z).
+            Required if AlphaFold is False.
+
+    Raises:
+        ValueError: If `AlphaFold` is False and either `box_size` or `box_center` is not provided.
+        Prints an error message if the external tool fails during execution.
+    """
 
         # use default values if AlphaFold protein
         if AlphaFold:
@@ -449,7 +522,20 @@ class DockPrep:
             print(f"Error preparing receptor {query}: {e}")
 
     def prepare_ligands_batch(self, ligands: List[Tuple[str, str]]) -> None:
-        """Batch process ligands: [(input_file, output_file), ...]"""
+        """
+    Prepares multiple ligand files for docking in a batch process.
+
+    This method iterates over a list of ligand input/output file pairs and prepares each 
+    ligand using the `prepare_ligand` method.
+
+    Args:
+        ligands (List[Tuple[str, str]]): A list of tuples, where each tuple contains:
+            - input_file (str): Path to the input ligand file.
+            - output_file (str): Path where the prepared ligand file will be saved.
+
+    Returns:
+        None
+    """
         for query, target in ligands:
             self.prepare_ligand(query, target)
 
@@ -466,9 +552,24 @@ class DockPrep:
         ],
     ) -> None:
         """
-        Batch process receptors:
-        [(input_file, output_prefix, box_size, box_center, AlphaFold), ...]
-        """
+    Prepares multiple receptor files for docking in a batch process.
+
+    This method iterates over a list of receptor preparation parameters and prepares each 
+    receptor using the `prepare_receptor` method. If the receptor is from AlphaFold, default 
+    box size and center are used.
+
+    Args:
+        receptors (List[Tuple[str, str, bool, Optional[Tuple[int, int, int]], Optional[Tuple[float, float, float]]]]): 
+            A list of tuples where each tuple contains:
+            - input_file (str): Path to the input receptor file.
+            - output_prefix (str): Output path prefix for the prepared receptor files.
+            - AlphaFold (bool): Whether the receptor is from AlphaFold.
+            - box_size (Optional[Tuple[int, int, int]]): Size of the docking box (x, y, z), required if AlphaFold is False.
+            - box_center (Optional[Tuple[float, float, float]]): Center of the docking box (x, y, z), required if AlphaFold is False.
+
+    Returns:
+        None
+    """
         for query, target_prefix, AlphaFold, box_size, box_center in receptors:
             if AlphaFold:
                 self.prepare_receptor(query, target_prefix, AlphaFold, None, None)
