@@ -33,7 +33,7 @@ class AutoDock:
         exhaustiveness: int = 32,
         n_poses: int = 5,
         save_csv: bool = True,
-    ) -> dict:
+    ) -> pl.DataFrame:
         """
         Run docking: Single Ligand - Single Receptor
 
@@ -76,7 +76,7 @@ class AutoDock:
                 df_docking_results.write_csv(output_path)
 
             print(f"Docking successful: Output saved in {output_dir}")
-            return docking_results
+            return df_docking_results
 
         except Exception as e:
             print(f"Docking failed: {str(e)}")
@@ -413,7 +413,7 @@ class AutoDock:
         return {
             "ligand": ligand_name,
             "receptor": receptor_name,
-            "binding_affinity": binding_affinity,
+            "binding_affinity": float(binding_affinity),
         }
 
 

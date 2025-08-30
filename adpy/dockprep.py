@@ -18,7 +18,7 @@ class DockPrep:
         self.default_box_center = (-0.319, 5.27, 1.59)
         self.default_box_size = (80, 80, 80)
 
-    def prepare_ligand(self, query: str, target: str) -> None:
+    def prepare_ligand(self, query: str, target: str) -> str:
         """
     Prepares a single ligand file for docking by converting or formatting it using an external tool.
 
@@ -36,8 +36,11 @@ class DockPrep:
             os.makedirs(os.path.dirname(target), exist_ok=True)
             subprocess.run([self.ligand_tool, "-i", query, "-o", target], check=True)
             print(f"Ligand prepared: {target}")
+
         except subprocess.CalledProcessError as e:
             print(f"Error preparing ligand {query}: {e}")
+
+        return target
 
     def prepare_receptor(
         self,
@@ -46,7 +49,7 @@ class DockPrep:
         AlphaFold: bool = True,
         box_size: Optional[Tuple[int, int, int]] = None,
         box_center: Optional[Tuple[float, float, float]] = None,
-    ) -> None:
+    ) -> str:
         """
     Prepares a single receptor file for docking by processing the input structure 
     and defining the docking box using an external tool.
@@ -85,6 +88,7 @@ class DockPrep:
             subprocess.run(
                 [
                     self.receptor_tool,
+                    "-a",
                     "-i",
                     query,
                     "-o",
@@ -101,6 +105,8 @@ class DockPrep:
             print(f"Receptor prepared: {target_prefix}")
         except subprocess.CalledProcessError as e:
             print(f"Error preparing receptor {query}: {e}")
+
+        return f"{target_prefix}.pdbqt"
 
     def prepare_ligands_batch(self, ligands: List[Tuple[str, str]]) -> None:
         """
